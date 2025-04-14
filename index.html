@@ -17,9 +17,23 @@
       margin-bottom: 10px;
       width: 100px;
     }
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      margin-right: 10px;
+    }
     .result {
       font-weight: bold;
       margin-top: 20px;
+    }
+    .log-section {
+      margin-top: 40px;
+      padding-top: 10px;
+      border-top: 1px solid #ccc;
+    }
+    .log-entry {
+      font-size: 0.9em;
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -35,6 +49,9 @@
   <label for="tropfenProMl">Tropfen je ml:</label>
   <input type="number" id="tropfenProMl" value="20" />
 
+  <br>
+  <button id="toggleLock">Eingabe sperren</button>
+
   <div class="result">
     <p>Flussrate (ml/min): <span id="rate"></span></p>
     <p>Gesamttropfen: <span id="gesamtTropfen"></span></p>
@@ -42,12 +59,22 @@
     <p>Tropfen pro Sekunde: <span id="tropfenProSek"></span></p>
   </div>
 
+  <div class="log-section">
+    <h2>⏱️ Gespeicherte Tropfen/Sekunden (letzte 30 Tage)</h2>
+    <div id="logDisplay"></div>
+  </div>
+
   <script>
+    const inputs = document.querySelectorAll("input");
+    const toggleButton = document.getElementById("toggleLock");
+    let isLocked = false;
+    let inactivityTimer;
+  
     function berechne() {
       const ml = parseFloat(document.getElementById("ml").value);
       const zeit = parseFloat(document.getElementById("zeit").value);
       const tropfenProMl = parseFloat(document.getElementById("tropfenProMl").value);
-
+  
       if (isNaN(ml) || isNaN(zeit) || isNaN(tropfenProMl) || zeit <= 0) {
         document.getElementById("rate").textContent = "-";
         document.getElementById("gesamtTropfen").textContent = "-";
@@ -55,25 +82,90 @@
         document.getElementById("tropfenProSek").textContent = "-";
         return;
       }
-
+  
       const rate = ml / zeit;
       const gesamtTropfen = ml * tropfenProMl;
       const tropfenProMin = gesamtTropfen / zeit;
       const tropfenProSek = tropfenProMin / 60;
-
+  
       document.getElementById("rate").textContent = rate.toFixed(2);
       document.getElementById("gesamtTropfen").textContent = gesamtTropfen.toFixed(0);
       document.getElementById("tropfenProMin").textContent = tropfenProMin.toFixed(2);
       document.getElementById("tropfenProSek").textContent = tropfenProSek.toFixed(2);
+  
+      resetInactivityTimer(tropfenProSek.toFixed(2));
     }
-
-    // Event-Listener hinzufügen, um bei jeder Eingabe zu berechnen
-    document.querySelectorAll("input").forEach(input => {
+  
+    function toggleInputsLock() {
+      isLocked = !isLocked;
+      inputs.forEach(input => input.disabled = isLocked);
+      toggleButton.textContent = isLocked ? "Eingabe entsperren" : "Eingabe sperren";
+  
+      if (isLocked) {
+        const currentValue = document.getElementById("tropfenProSek").textContent;
+        if (currentValue && currentValue !== "-") {
+          saveLog(currentValue);
+        }
+      }
+    }
+  
+    toggleButton.addEventListener("click", toggleInputsLock);
+  
+    inputs.forEach(input => {
       input.addEventListener("input", berechne);
     });
+  
+    function resetInactivityTimer(tropfenWert) {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        saveLog(tropfenWert);
+      }, 10000); // 10 Sekunden
+    }
+  
+    function saveLog(tropfenProSek, typ = "autosave") {
+  const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
+  const timestamp = new Date().toISOString();
+  logs.push({ value: tropfenProSek, timestamp, type: typ });
+  localStorage.setItem("tropfenLogs", JSON.stringify(logs));
+  cleanupOldLogs();
+  showLogs();
+}
 
-    // Initiale Berechnung beim Laden
-    window.onload = berechne;
+  
+    function cleanupOldLogs() {
+      const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
+      const now = new Date();
+      const filtered = logs.filter(entry => {
+        const entryDate = new Date(entry.timestamp);
+        const diffDays = (now - entryDate) / (1000 * 60 * 60 * 24);
+        return diffDays <= 30;
+      });
+      localStorage.setItem("tropfenLogs", JSON.stringify(filtered));
+    }
+  
+    function showLogs() {
+      const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
+      const display = document.getElementById("logDisplay");
+      display.innerHTML = "";
+      if (logs.length === 0) {
+        display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
+      } else {
+        logs.forEach(entry => {
+          const date = new Date(entry.timestamp);
+          const div = document.createElement("div");
+          div.className = "log-entry";
+          div.textContent = `${entry.value} Tropfen/Sek - gespeichert am ${date.toLocaleString("de-DE")}`;
+          display.appendChild(div);
+        });
+      }
+    }
+  
+    window.onload = () => {
+      berechne();
+      cleanupOldLogs();
+      showLogs();
+    };
   </script>
+  
 </body>
 </html>
