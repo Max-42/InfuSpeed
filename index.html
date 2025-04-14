@@ -4,6 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Infusionsrechner</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1976d2">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     <style>
         body {
             font-family: sans-serif;
@@ -57,12 +64,12 @@
         <input type="number" id="tropfenProMl" value="20">
     </label>
 
-    <button id="toggleLock">Eingabe sperren</button>
+    <button id="toggleLock">Speichern</button>
 
     <div class="result">
-        <p><strong>Flussrate (ml/min):</strong> <span id="rate">-</span></p>
-        <p><strong>Gesamte Tropfen:</strong> <span id="gesamtTropfen">-</span></p>
-        <p><strong>Tropfen/Minute:</strong> <span id="tropfenProMin">-</span></p>
+        <p>Flussrate (ml/min):<span id="rate">-</span></p>
+        <p>Gesamte Tropfen:<span id="gesamtTropfen">-</span></p>
+        <p>Tropfen/Minute:<span id="tropfenProMin">-</span></p>
         <p><strong>Tropfen/Sekunde:</strong> <span id="tropfenProSek">-</span></p>
     </div>
 
@@ -107,7 +114,7 @@
         function toggleInputsLock() {
             isLocked = !isLocked;
             inputs.forEach(input => input.disabled = isLocked);
-            toggleButton.textContent = isLocked ? "Eingabe entsperren" : "Eingabe sperren";
+            toggleButton.textContent = isLocked ? "Eingabe entsperren" : "Speichern";
 
             if (isLocked) {
                 const currentValue = document.getElementById("tropfenProSek").textContent;
@@ -128,13 +135,27 @@
         }
 
         function saveLog(tropfenProSek, typ = "autosave") {
+            const ml = parseFloat(document.getElementById("ml").value);
+            const zeit = parseFloat(document.getElementById("zeit").value);
+
             const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
+
+            // Avoid duplicate autosaves
+            if (typ === "autosave" && logs.length > 0) {
+                const last = logs[logs.length - 1];
+                if (last.value === tropfenProSek && last.ml === ml && last.zeit === zeit && last.type === "autosave") {
+                    return;
+                }
+            }
+
             const timestamp = new Date().toISOString();
-            logs.push({ value: tropfenProSek, timestamp, type: typ });
+            logs.push({ value: tropfenProSek, timestamp, type: typ, ml: ml, zeit: zeit });
             localStorage.setItem("tropfenLogs", JSON.stringify(logs));
             cleanupOldLogs();
             showLogs();
         }
+
+
 
         function cleanupOldLogs() {
             const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
@@ -159,11 +180,12 @@
                     const label = entry.type === "manuell" ? "gespeichert" : "autosave";
                     const div = document.createElement("div");
                     div.className = "log-entry";
-                    div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")}`;
+                    div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
                     display.appendChild(div);
                 });
             }
         }
+
 
         function exportToExcel() {
             const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
@@ -172,22 +194,23 @@
                 return;
             }
 
-            let csv = "Tropfen/Sek;Typ;Gespeichert am\n";
+            let csv = "Tropfen/Sek;Typ;ML;Zeit (Minuten);Gespeichert am\n";
             logs.forEach(log => {
                 const date = new Date(log.timestamp).toLocaleString("de-DE");
                 const typ = log.type === "manuell" ? "gespeichert" : "autosave";
-                csv += `${log.value};${typ};${date}\n`;
+                csv += `${log.value};${typ};${log.ml};${log.zeit};${date}\n`;
             });
 
             const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "TropfenLogs.xlsx"; // Excel-kompatibel trotz CSV
+            a.download = "TropfenLogs.xlsx"; // CSV disguised as XLSX
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
+
 
         function deleteAllLogs() {
             if (confirm("Möchtest du wirklich alle Logs löschen?")) {
