@@ -15,10 +15,11 @@
     input {
       padding: 5px;
       margin-bottom: 10px;
+      width: 100px;
     }
     .result {
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -26,20 +27,19 @@
   <h1>Infusionsgeschwindigkeit Rechner</h1>
 
   <label for="ml">Milliliter (ml):</label>
-  <input type="number" id="ml" />
+  <input type="number" id="ml" value="200" />
 
   <label for="zeit">Zeit (Minuten):</label>
-  <input type="number" id="zeit" />
+  <input type="number" id="zeit" value="30" />
 
   <label for="tropfenProMl">Tropfen je ml:</label>
-  <input type="number" id="tropfenProMl" />
-
-  <button onclick="berechne()">Berechnen</button>
+  <input type="number" id="tropfenProMl" value="20" />
 
   <div class="result">
     <p>Flussrate (ml/min): <span id="rate"></span></p>
     <p>Gesamttropfen: <span id="gesamtTropfen"></span></p>
     <p>Tropfen pro Minute: <span id="tropfenProMin"></span></p>
+    <p>Tropfen pro Sekunde: <span id="tropfenProSek"></span></p>
   </div>
 
   <script>
@@ -49,18 +49,31 @@
       const tropfenProMl = parseFloat(document.getElementById("tropfenProMl").value);
 
       if (isNaN(ml) || isNaN(zeit) || isNaN(tropfenProMl) || zeit <= 0) {
-        alert("Bitte gültige Werte eingeben (Zeit darf nicht 0 sein).");
+        document.getElementById("rate").textContent = "-";
+        document.getElementById("gesamtTropfen").textContent = "-";
+        document.getElementById("tropfenProMin").textContent = "-";
+        document.getElementById("tropfenProSek").textContent = "-";
         return;
       }
 
       const rate = ml / zeit;
       const gesamtTropfen = ml * tropfenProMl;
       const tropfenProMin = gesamtTropfen / zeit;
+      const tropfenProSek = tropfenProMin / 60;
 
       document.getElementById("rate").textContent = rate.toFixed(2);
       document.getElementById("gesamtTropfen").textContent = gesamtTropfen.toFixed(0);
       document.getElementById("tropfenProMin").textContent = tropfenProMin.toFixed(2);
+      document.getElementById("tropfenProSek").textContent = tropfenProSek.toFixed(2);
     }
+
+    // Event-Listener hinzufügen, um bei jeder Eingabe zu berechnen
+    document.querySelectorAll("input").forEach(input => {
+      input.addEventListener("input", berechne);
+    });
+
+    // Initiale Berechnung beim Laden
+    window.onload = berechne;
   </script>
 </body>
 </html>
