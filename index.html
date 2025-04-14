@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Infusionsgeschwindigkeit Rechner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input {
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .result {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Infusionsgeschwindigkeit Rechner</h1>
+
+  <label for="ml">Milliliter (ml):</label>
+  <input type="number" id="ml" />
+
+  <label for="zeit">Zeit (Minuten):</label>
+  <input type="number" id="zeit" />
+
+  <label for="tropfenProMl">Tropfen je ml:</label>
+  <input type="number" id="tropfenProMl" />
+
+  <button onclick="berechne()">Berechnen</button>
+
+  <div class="result">
+    <p>Flussrate (ml/min): <span id="rate"></span></p>
+    <p>Gesamttropfen: <span id="gesamtTropfen"></span></p>
+    <p>Tropfen pro Minute: <span id="tropfenProMin"></span></p>
+  </div>
+
+  <script>
+    function berechne() {
+      const ml = parseFloat(document.getElementById("ml").value);
+      const zeit = parseFloat(document.getElementById("zeit").value);
+      const tropfenProMl = parseFloat(document.getElementById("tropfenProMl").value);
+
+      if (isNaN(ml) || isNaN(zeit) || isNaN(tropfenProMl) || zeit <= 0) {
+        alert("Bitte gültige Werte eingeben (Zeit darf nicht 0 sein).");
+        return;
+      }
+
+      const rate = ml / zeit;
+      const gesamtTropfen = ml * tropfenProMl;
+      const tropfenProMin = gesamtTropfen / zeit;
+
+      document.getElementById("rate").textContent = rate.toFixed(2);
+      document.getElementById("gesamtTropfen").textContent = gesamtTropfen.toFixed(0);
+      document.getElementById("tropfenProMin").textContent = tropfenProMin.toFixed(2);
+    }
+  </script>
+</body>
+</html>
