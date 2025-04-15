@@ -1,4 +1,4 @@
-const CACHE_NAME = 'infusionsrechner-v11';
+const CACHE_NAME = 'infusionsrechner-v12';
 
 const urlsToCache = [
   '/',

@@ -1,11 +1,11 @@
 {
-  "name": "Infusionsgeschwindigkeits Rechner",
-  "short_name": "Infusionsrechner",
+  "name": "Infusionsrechner",
+  "short_name": "InfuSpeed",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1976d2",
-  "description": "A calculator for infusion speed.",
+  "description": "Ein Rechner für Infusionsgeschwindigkeit.",
   "icons": [
     {
       "src": "icon-192.png",
