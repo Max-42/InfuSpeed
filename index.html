@@ -62,7 +62,8 @@
             font-size: 1em;
             border-radius: 5px;
             background-color: var(--result-background);
-            border: 0px
+            border: 0px;
+            color: var(--text-color);
         }
 
         .result {
@@ -128,6 +129,28 @@
         #darkModeToggle {
             float: right;
         }
+
+        #sharePopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #shareLink {
+            width: 100%;
+            padding: 5px;
+            font-size: 1em;
+            border-radius: 5px;
+            background-color: var(--result-background);
+            border: 0px;
+        }
     </style>
 </head>
 
@@ -174,8 +197,16 @@
 
         <button onclick="invalidateCaches()">♻️ Auf Updates prüfen</button>
 
+        <button id="shareButton">🔗 Teilen</button>
 
-        
+        <div id="sharePopup">
+            <img src="./qrcode.svg" alt="QR Code" style="max-width: 100%; height: auto; margin-bottom: 10px;">
+            <p>🔗 Teile diesen Link:</p>
+            <input type="text" id="shareLink" value="" readonly>
+            <button id="closeSharePopup">❌ Schließen</button>
+        </div>
+
+
 
 
         <br>
@@ -268,6 +299,11 @@
 
     <script>
         const darkModeToggle = document.getElementById("darkModeToggle");
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        const initialTheme = prefersDarkScheme.matches ? "dark" : "light";
+        document.body.setAttribute("data-theme", initialTheme);
+        darkModeToggle.textContent = initialTheme === "dark" ? "☀️" : "🌙";
 
         darkModeToggle.addEventListener("click", () => {
             const currentTheme = document.body.getAttribute("data-theme");
@@ -420,19 +456,19 @@
         }
 
         function invalidateCaches() {
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(registrations => {
-                        registrations.forEach(registration => {
-                            registration.unregister().then(() => {
-                                alert("Cache wurde aktualisiert. Bitte die Seite neu laden.");
-                                location.reload();
-                            });
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(registration => {
+                        registration.unregister().then(() => {
+                            alert("Cache wurde aktualisiert. Bitte die Seite neu laden.");
+                            location.reload();
                         });
                     });
-                } else {
-                    alert("Service Worker wird von diesem Browser nicht unterstützt.");
-                }
+                });
+            } else {
+                alert("Service Worker wird von diesem Browser nicht unterstützt.");
             }
+        }
 
 
         window.onload = () => {
@@ -440,6 +476,72 @@
             cleanupOldLogs();
             showLogs();
         };
+
+        // Allow closing the share popup with Ctrl+C, Esc, or Tab
+        document.addEventListener("keydown", (event) => {
+            if (sharePopup.style.display === "block") {
+            if (event.key === "Escape" || 
+            event.key === "Tab" || 
+            (event.ctrlKey && event.key === "c") || 
+            event.key === "Enter" ||
+            event.code === "Space" ||
+            event.key === "q") {
+                event.preventDefault();
+                sharePopup.style.display = "none";
+                backdrop.style.display = "none";
+            }
+            }
+        });
+        const shareButton = document.getElementById("shareButton");
+        const sharePopup = document.getElementById("sharePopup");
+        const shareLink = document.getElementById("shareLink");
+        const closeSharePopup = document.getElementById("closeSharePopup");
+
+        // Create a backdrop for the popup
+        const backdrop = document.createElement("div");
+        backdrop.style.position = "fixed";
+        backdrop.style.top = "0";
+        backdrop.style.left = "0";
+        backdrop.style.width = "100%";
+        backdrop.style.height = "100%";
+        backdrop.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        backdrop.style.zIndex = "999";
+        backdrop.style.display = "none";
+        document.body.appendChild(backdrop);
+
+        shareButton.addEventListener("click", async () => {
+            //const url = window.location.href;
+            const url = "https://infuspeed.dyren.de"; //ToDo
+            shareLink.value = url;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "Infusionsrechner",
+                        text: "Schau dir diesen Infusionsrechner an!",
+                        url: url
+                    });
+                } catch (err) {
+                    console.error("Teilen fehlgeschlagen:", err);
+                }
+            } else {
+                sharePopup.style.display = "block";
+                backdrop.style.display = "block";
+            }
+        });
+
+        closeSharePopup.addEventListener("click", () => {
+            sharePopup.style.display = "none";
+            backdrop.style.display = "none";
+        });
+
+        // Close popup by clicking on the backdrop
+        backdrop.addEventListener("click", () => {
+            sharePopup.style.display = "none";
+            backdrop.style.display = "none";
+        });
+
+
     </script>
 </body>
 
