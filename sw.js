@@ -7,16 +7,37 @@ const urlsToCache = [
   '/icon-512.png'
 ];
 
-self.addEventListener('install', function(event) {
+// Install & cache all files
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-self.addEventListener('fetch', function(event) {
+// Activate & clean old caches if needed
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Intercept fetches – Serve from cache first, then fall back to network
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response =>
-      response || fetch(event.request)
-    )
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    }).catch(() => {
+      // Optionally fallback to offline.html if needed
+    })
   );
 });
