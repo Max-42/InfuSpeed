@@ -1,4 +1,5 @@
-const CACHE_NAME = 'infusionsrechner-v1';
+const CACHE_NAME = 'infusionsrechner-v7';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -9,6 +10,7 @@ const urlsToCache = [
 
 // Install & cache all files
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Force the new Service Worker to activate immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -29,6 +31,7 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  self.clients.claim(); // Take control of all open pages immediately
 });
 
 // Intercept fetches – Serve from cache first, then fall back to network

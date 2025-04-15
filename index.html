@@ -50,34 +50,42 @@
 </head>
 
 <body>
-    <h1>💧 Infusionsgeschwindigkeit Rechner</h1>
+    <h1>Infusionsgeschwindigkeit Rechner 💧 </h1>
 
-    <label>📦 Milliliter:
-        <input type="number" id="ml" value="200">
-    </label>
+    <div class="container">
+        <p>Gib die Werte ein, um die Infusionsgeschwindigkeit zu berechnen.</p>
+        <p>Die Werte werden automatisch gespeichert, wenn du auf "Speichern" klickst oder nach 10 Sekunden Inaktivität.
+        </p>
+        <p>Die Logs sind 30 Tage lang verfügbar.</p>
 
-    <label>⏱️ Zeit (Minuten):
-        <input type="number" id="zeit" value="30">
-    </label>
+        <label>📦 Milliliter:
+            <input type="number" id="ml" value="200">
+        </label>
 
-    <label>💧 Tropfen je ml:
-        <input type="number" id="tropfenProMl" value="20">
-    </label>
+        <label>⏱️ Zeit (Minuten):
+            <input type="number" id="zeit" value="30">
+        </label>
 
-    <button id="toggleLock">🔒 Speichern</button>
+        <label>💧 Tropfen je ml:
+            <input type="number" id="tropfenProMl" value="20">
+        </label>
 
-    <div class="result">
-        <p>📊 Flussrate (ml/min): <span id="rate">-</span></p>
-        <p>💧 Gesamte Tropfen: <span id="gesamtTropfen">-</span></p>
-        <p>⏳ Tropfen/Minute: <span id="tropfenProMin">-</span></p>
-        <p><strong>⏱️ Tropfen/Sekunde:</strong> <span id="tropfenProSek">-</span></p>
+        <button id="toggleLock">🔒 Speichern</button>
+
+        <div class="result">
+            <p>📊 Flussrate (ml/min): <span id="rate">-</span></p>
+            <p>💧 Gesamte Tropfen: <span id="gesamtTropfen">-</span></p>
+            <p>⏳ Tropfen/Minute: <span id="tropfenProMin">-</span></p>
+            <p><strong>⏱️ Tropfen/Sekunde:</strong> <span id="tropfenProSek">-</span></p>
+        </div>
+
+        <button onclick="exportToExcel()">📤 Exportieren als Excel (.xlsx)</button>
+        <button onclick="deleteAllLogs()">🗑️ Alle Logs löschen</button>
+
+        <h2>📜 Log:</h2>
+        <div id="logDisplay"></div>
+
     </div>
-
-    <button onclick="exportToExcel()">📤 Exportieren als Excel (.xlsx)</button>
-    <button onclick="deleteAllLogs()">🗑️ Alle Logs löschen</button>
-
-    <h2>📜 Log:</h2>
-    <div id="logDisplay"></div>
 
     <script>
         const inputs = document.querySelectorAll("input");
@@ -133,7 +141,7 @@
                 saveLog(tropfenWert, "autosave");
             }, 10000);
         }
-        
+
         function saveLog(tropfenProSek, typ = "autosave") {
             const ml = parseFloat(document.getElementById("ml").value);
             const zeit = parseFloat(document.getElementById("zeit").value);
