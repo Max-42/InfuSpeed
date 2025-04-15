@@ -215,6 +215,13 @@
             <button id="closeSharePopup">❌ Schließen</button>
         </div>
 
+        
+        <button id="installButton" style="margin-top: 10px; padding: 8px 12px; font-size: 1em;">📲 App installieren</button>
+
+        
+        
+
+        
 
 
 
@@ -552,6 +559,34 @@
             sharePopup.style.display = "none";
             backdrop.style.display = "none";
         });
+
+
+        // Install PWA
+        let deferredPrompt;
+        const installButton = document.getElementById("installButton");
+        installButton.style.display = "none";
+        window.addEventListener("beforeinstallprompt", (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = "block";
+        });
+        installButton.addEventListener("click", async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === "accepted") {
+                    console.log("App installiert");
+                }
+                deferredPrompt = null;
+                installButton.style.display = "none";
+            }
+        });
+        // Show install button if already installed or unsupported
+        if (window.matchMedia("(display-mode: standalone)").matches || !window.matchMedia || navigator.userAgent.toLowerCase().includes("firefox")) {
+            installButton.style.display = "none";
+        } else {
+            installButton.style.display = "block";
+        }
 
 
     </script>
