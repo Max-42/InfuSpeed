@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <title>💧 Infusionsrechner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ein einfacher Rechner zur Berechnung der Infusionsgeschwindigkeit.">
+    <meta name="author" content="Max Oppermann">
+    <meta name="keywords" content="Infusionsrechner, Tropfenrechner, Medizin, Gesundheit">
+    <meta name="theme-color" content="#1976d2">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1976d2">
     <script>
@@ -12,11 +20,35 @@
         }
     </script>
     <style>
+        :root {
+            --background-color: #ffffff;
+            --text-color: #000000;
+            --container-background: #fff;
+            --result-background: #e0f7fa91;
+            --log-entry-background: #f1f8e9;
+            --log-display-background: #f9fbe7;
+            --log-entry-odd: #e3f2fd;
+            --log-entry-even: #fce4ec;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #121212;
+            --text-color: #ffffff;
+            --container-background: #1e1e1e;
+            --result-background: #37474f;
+            --log-entry-background: #263238;
+            --log-display-background: #212121;
+            --log-entry-odd: #37474f;
+            --log-entry-even: #455a64;
+        }
+
         body {
             font-family: sans-serif;
             padding: 20px;
             max-width: 600px;
             margin: auto;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
 
         label {
@@ -28,17 +60,23 @@
             width: 100%;
             padding: 5px;
             font-size: 1em;
+            border-radius: 5px;
+            background-color: var(--result-background);
+            border: 0px
         }
 
         .result {
             margin-top: 20px;
             padding: 10px;
-            background: #f0f0f0;
+            background: var(--result-background);
             border-radius: 5px;
         }
 
         .log-entry {
             margin: 5px 0;
+            padding: 5px;
+            background: var(--log-entry-background);
+            border-radius: 5px;
         }
 
         button {
@@ -46,17 +84,63 @@
             padding: 8px 12px;
             font-size: 1em;
         }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: var(--container-background);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container #logDisplay {
+            max-height: 333px;
+            overflow-y: auto;
+            margin-top: 10px;
+            background: var(--log-display-background);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .container #logDisplay div.log-entry:nth-child(odd) {
+            background: var(--log-entry-odd);
+        }
+
+        .container #logDisplay div.log-entry:nth-child(even) {
+            background: var(--log-entry-even);
+        }
+        #darkModeToggle {
+            float: right;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Infusionsgeschwindigkeit Rechner 💧 </h1>
+    <h1>Infusionsgeschwindigkeit Rechner 💧</h1>
+
+    
 
     <div class="container">
         <p>Gib die Werte ein, um die Infusionsgeschwindigkeit zu berechnen.</p>
-        <p>Die Werte werden automatisch gespeichert, wenn du auf "Speichern" klickst oder nach 10 Sekunden Inaktivität.
-        </p>
+        <p>Die Werte werden automatisch gespeichert, wenn du auf "Speichern" klickst oder nach 10 Sekunden Inaktivität.</p>
         <p>Die Logs sind 30 Tage lang verfügbar.</p>
+
+        <br>
 
         <label>📦 Milliliter:
             <input type="number" id="ml" value="200">
@@ -70,7 +154,7 @@
             <input type="number" id="tropfenProMl" value="20">
         </label>
 
-        <button id="toggleLock">🔒 Speichern</button>
+        <button id="toggleLock">🔒 Speichern (Tastensperre)</button>
 
         <div class="result">
             <p>📊 Flussrate (ml/min): <span id="rate">-</span></p>
@@ -79,15 +163,24 @@
             <p><strong>⏱️ Tropfen/Sekunde:</strong> <span id="tropfenProSek">-</span></p>
         </div>
 
-        <button onclick="exportToExcel()">📤 Exportieren als Excel (.xlsx)</button>
-        <button onclick="deleteAllLogs()">🗑️ Alle Logs löschen</button>
-
         <h2>📜 Log:</h2>
         <div id="logDisplay"></div>
 
+        <button onclick="exportToExcel()">📤 Exportieren als Excel (.xlsx)</button>
+        <button onclick="deleteAllLogs()">🗑️ Alle Logs löschen</button>
+        <button id="darkModeToggle">🌙</button>
     </div>
 
     <script>
+        const darkModeToggle = document.getElementById("darkModeToggle");
+
+        darkModeToggle.addEventListener("click", () => {
+            const currentTheme = document.body.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            document.body.setAttribute("data-theme", newTheme);
+            darkModeToggle.textContent = newTheme === "dark" ? "☀️" : "🌙";
+        });
+
         const inputs = document.querySelectorAll("input");
         const toggleButton = document.getElementById("toggleLock");
         let isLocked = false;
@@ -179,16 +272,22 @@
             const display = document.getElementById("logDisplay");
             display.innerHTML = "";
             if (logs.length === 0) {
-                display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
+            display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
             } else {
-                logs.forEach((entry) => {
-                    const date = new Date(entry.timestamp);
-                    const label = entry.type === "manuell" ? "gespeichert" : "autosave";
-                    const div = document.createElement("div");
-                    div.className = "log-entry";
-                    div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
-                    display.appendChild(div);
-                });
+            logs.forEach((entry, index) => {
+                const date = new Date(entry.timestamp);
+                const label = entry.type === "manuell" ? "gespeichert" : "autosave";
+                const div = document.createElement("div");
+                div.className = "log-entry";
+                div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
+                
+                // Highlight the newest entry
+                if (index === logs.length - 1) {
+                div.style.fontWeight = "bold";
+                }
+
+                display.appendChild(div);
+            });
             }
         }
 
@@ -224,6 +323,7 @@
                 showLogs();
             }
         }
+
 
         window.onload = () => {
             berechne();
