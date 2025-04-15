@@ -124,6 +124,7 @@
         .container #logDisplay div.log-entry:nth-child(even) {
             background: var(--log-entry-even);
         }
+
         #darkModeToggle {
             float: right;
         }
@@ -133,11 +134,12 @@
 <body>
     <h1>Infusionsgeschwindigkeits Rechner 💧</h1>
 
-    
+
 
     <div class="container">
         <p>Gib die Werte ein, um die Infusionsgeschwindigkeit zu berechnen.</p>
-        <p>Die Werte werden automatisch gespeichert, wenn du auf "Speichern" klickst oder nach 10 Sekunden Inaktivität.</p>
+        <p>Die Werte werden automatisch gespeichert, wenn du auf "Speichern" klickst oder nach 10 Sekunden Inaktivität.
+        </p>
         <p>Die Logs sind 30 Tage lang verfügbar.</p>
 
         <br>
@@ -169,6 +171,99 @@
         <button onclick="exportToExcel()">📤 Exportieren als Excel (.xlsx)</button>
         <button onclick="deleteAllLogs()">🗑️ Alle Logs löschen</button>
         <button id="darkModeToggle">🌙</button>
+
+        <button onclick="invalidateCaches()">♻️ Auf Updates prüfen</button>
+
+
+        
+
+
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <h2>📄 Impressum und Pflichtinformationen</h2>
+        <div class="container">
+            <p><strong>Verantwortlich für den Inhalt:</strong></p>
+            <p>Max Oppermann<br>
+                Spinnerstraße 39<br>
+                38114 Braunschweig<br>
+                Deutschland</p>
+
+            <p><strong>Kontakt:</strong></p>
+            <p>Telefon: +49 162 4567 100<br>
+                E-Mail: max@dyren.de</p>
+
+
+            <p><strong>Haftungsausschluss:</strong></p>
+            <p>Die bereitgestellten Informationen auf dieser Website dienen ausschließlich allgemeinen
+                Informationszwecken. Trotz sorgfältiger Prüfung übernehmen wir keine Haftung für die Richtigkeit,
+                Vollständigkeit und Aktualität der Inhalte.</p>
+
+            <p><strong>Streitschlichtung:</strong></p>
+            <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a
+                    href="https://ec.europa.eu/consumers/odr" target="_blank"
+                    rel="noopener noreferrer">https://ec.europa.eu/consumers/odr</a>. Wir sind nicht verpflichtet und
+                nicht bereit, an einem Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+            </p>
+        </div>
+        <br>
+        <br>
+        <br>
+        <h3>📄 Datenschutzerklärung</h3>
+        <div class="container">
+
+            <p>Der Schutz Ihrer Daten ist uns wichtig. Diese Anwendung ist vollständig <strong>offlinefähig</strong>
+                und als <strong>Progressive Web App (PWA)</strong> konzipiert. Nachfolgend informieren wir Sie über
+                die Art und Weise der Datenverarbeitung.</p>
+
+            <h4>1. Lokale Datenverarbeitung</h4>
+            <p>Alle von Ihnen eingegebenen Daten werden <strong>ausschließlich lokal auf Ihrem Gerät</strong>
+                verarbeitet und gespeichert. Es erfolgt <strong>keine Übertragung</strong> der Daten an einen Server
+                oder Dritte.</p>
+            <p>Die Speicherung erfolgt über den <strong>Local Storage</strong> Ihres Browsers. Diese Daten bleiben
+                auf Ihrem Gerät, bis Sie sie manuell löschen (z. B. durch das Löschen der Browserdaten).</p>
+            <p>Die Anwendung sendet <strong>keinerlei Daten an den Server zurück</strong>. Alle Funktionen stehen
+                vollständig clientseitig zur Verfügung.</p>
+
+            <h4>2. Keine Internetverbindung erforderlich</h4>
+            <p>Nach dem ersten Laden der Anwendung ist <strong>keine Internetverbindung mehr notwendig</strong>, um
+                sie zu nutzen. Alle Funktionen stehen offline zur Verfügung.</p>
+
+            <h4>3. Keine Cookies, kein Tracking</h4>
+            <p>Diese Anwendung verwendet <strong>keine Cookies</strong> und <strong>kein Tracking</strong> (z. B.
+                Google Analytics). Es werden keinerlei personenbezogene Daten erfasst, analysiert oder an Dritte
+                weitergegeben.</p>
+
+            <h4>4. Hosting über GitHub Pages</h4>
+            <p>Diese Anwendung wird als <strong>statische Website</strong> über den Dienst <a
+                    href="https://pages.github.com/" target="_blank">GitHub Pages</a> bereitgestellt. Beim Aufruf
+                der Seite kann GitHub technische Informationen (z. B. IP-Adresse, Datum, Uhrzeit) erfassen. Diese
+                Verarbeitung liegt außerhalb des Einflussbereichs dieser Anwendung.</p>
+
+            <p><strong>Hosting-Anbieter:</strong><br>
+                GitHub Inc.<br>
+                88 Colin P Kelly Jr St<br>
+                San Francisco, CA 94107<br>
+                United States</p>
+
+            <p>Weitere Informationen finden Sie in der <a
+                    href="https://docs.github.com/en/github/site-policy/github-privacy-statement#github-pages"
+                    target="_blank">Datenschutzerklärung von GitHub</a>.</p>
+
+            <h4>5. Kein Auftragsverarbeitungsvertrag erforderlich</h4>
+            <p>Da bei der Nutzung dieser Anwendung <strong>keine personenbezogenen Daten</strong> an den
+                Hosting-Anbieter übertragen werden, ist laut der Einschätzung der Datenschutz-Aufsichtsbehörden
+                <strong>kein Auftragsverarbeitungsvertrag notwendig</strong>.
+            </p>
+            <p>Details hierzu finden Sie im offiziellen Dokument der Bayerischen Datenschutzaufsicht: <a
+                    href="https://www.lda.bayern.de/media/veroeffentlichungen/FAQ_Hosting_keine_Auftragsverarbeitung.pdf"
+                    target="_blank">FAQ: Hosting – Keine Auftragsverarbeitung</a></p>
+
+
+        </div>
     </div>
 
     <script>
@@ -272,22 +367,22 @@
             const display = document.getElementById("logDisplay");
             display.innerHTML = "";
             if (logs.length === 0) {
-            display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
+                display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
             } else {
-            logs.forEach((entry, index) => {
-                const date = new Date(entry.timestamp);
-                const label = entry.type === "manuell" ? "gespeichert" : "autosave";
-                const div = document.createElement("div");
-                div.className = "log-entry";
-                div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
-                
-                // Highlight the newest entry
-                if (index === logs.length - 1) {
-                div.style.fontWeight = "bold";
-                }
+                logs.forEach((entry, index) => {
+                    const date = new Date(entry.timestamp);
+                    const label = entry.type === "manuell" ? "gespeichert" : "autosave";
+                    const div = document.createElement("div");
+                    div.className = "log-entry";
+                    div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
 
-                display.appendChild(div);
-            });
+                    // Highlight the newest entry
+                    if (index === logs.length - 1) {
+                        div.style.fontWeight = "bold";
+                    }
+
+                    display.appendChild(div);
+                });
             }
         }
 
@@ -323,6 +418,21 @@
                 showLogs();
             }
         }
+
+        function invalidateCaches() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(registration => {
+                            registration.unregister().then(() => {
+                                alert("Cache wurde aktualisiert. Bitte die Seite neu laden.");
+                                location.reload();
+                            });
+                        });
+                    });
+                } else {
+                    alert("Service Worker wird von diesem Browser nicht unterstützt.");
+                }
+            }
 
 
         window.onload = () => {
