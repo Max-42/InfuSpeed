@@ -29,10 +29,11 @@
             --log-display-background: #f9fbe7;
             --log-entry-odd: #e3f2fd;
             --log-entry-even: #fce4ec;
+            --link: #1976d2;
         }
 
         [data-theme="dark"] {
-            --background-color: #121212;
+            --background-color: #222222;
             --text-color: #ffffff;
             --container-background: #1e1e1e;
             --result-background: #37474f;
@@ -40,6 +41,7 @@
             --log-display-background: #212121;
             --log-entry-odd: #37474f;
             --log-entry-even: #455a64;
+            --link: #bb86fc;
         }
 
         body {
@@ -150,6 +152,13 @@
             border-radius: 5px;
             background-color: var(--result-background);
             border: 0px;
+        }
+        a {
+            color: var(--link);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -403,22 +412,25 @@
             const display = document.getElementById("logDisplay");
             display.innerHTML = "";
             if (logs.length === 0) {
-                display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
+            display.innerHTML = "<p>Keine Einträge vorhanden.</p>";
             } else {
-                logs.forEach((entry, index) => {
-                    const date = new Date(entry.timestamp);
-                    const label = entry.type === "manuell" ? "gespeichert" : "autosave";
-                    const div = document.createElement("div");
-                    div.className = "log-entry";
-                    div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
+            logs.forEach((entry, index) => {
+                const date = new Date(entry.timestamp);
+                const label = entry.type === "manuell" ? "gespeichert" : "autosave";
+                const div = document.createElement("div");
+                div.className = "log-entry";
+                div.textContent = `${entry.value} Tropfen/Sek – ${label} am ${date.toLocaleString("de-DE")} (ML: ${entry.ml}, Zeit: ${entry.zeit} min)`;
 
-                    // Highlight the newest entry
-                    if (index === logs.length - 1) {
-                        div.style.fontWeight = "bold";
-                    }
+                // Highlight the newest entry
+                if (index === logs.length - 1) {
+                div.style.fontWeight = "bold";
+                }
 
-                    display.appendChild(div);
-                });
+                display.appendChild(div);
+            });
+
+            // Autoscroll to the latest log
+            display.scrollTop = display.scrollHeight;
             }
         }
 
