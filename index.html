@@ -393,7 +393,7 @@
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
                 saveLog(tropfenWert, "autosave");
-            }, 10000);
+            }, 10000); // 10 Sekunden
         }
 
         function saveLog(tropfenProSek, typ = "autosave") {
@@ -402,12 +402,14 @@
 
             const logs = JSON.parse(localStorage.getItem("tropfenLogs") || "[]");
 
-            // Avoid duplicate autosaves
+            // Avoid duplicate autosave
             if (typ === "autosave" && logs.length > 0) {
-                const last = logs[logs.length - 1];
-                if (last.value === tropfenProSek && last.ml === ml && last.zeit === zeit && last.type === "autosave") {
-                    return;
+            const last = logs[logs.length - 1];
+            if (last.value === tropfenProSek && last.ml === ml && last.zeit === zeit) {
+                if (last.type === "autosave" || last.type === "manuell") {
+                return;
                 }
+            }
             }
 
             const timestamp = new Date().toISOString();

@@ -1,11 +1,12 @@
-const CACHE_NAME = 'infusionsrechner-v12';
+const CACHE_NAME = 'infusionsrechner-v13';
 
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/qrcode.svg'
 ];
 
 // Install & cache all files
